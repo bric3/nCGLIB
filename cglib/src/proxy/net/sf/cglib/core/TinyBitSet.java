@@ -51,87 +51,66 @@
  * information on the Apache Software Foundation, please see
  * <http://www.apache.org/>.
  */
-package net.sf.cglib.util;
+package net.sf.cglib.core;
 
-import net.sf.cglib.CodeGenTestCase;
-import java.io.*;
-import java.lang.reflect.Method;
-import java.util.*;
-import junit.framework.*;
+public class TinyBitSet {
+    private static int[] T = new int[256];
+    private int value = 0;
 
-/**
- * @author Chris Nokleberg <a href="mailto:chris@nokleberg.com">chris@nokleberg.com</a>
- * @version $Id: TestParallelSorter.java,v 1.2 2003-09-18 17:23:29 herbyderby Exp $
- */
-public class TestParallelSorter extends CodeGenTestCase {
-    public void testSorts() throws Throwable {
-        Object[] data1 = getTestData();
-        Object[] data2 = copy(data1);
-        Object[] data3 = copy(data1);
-        int[] idx1 = getIndexes(data1.length);
-        int[] idx2 = getIndexes(data1.length);
-        int[] idx3 = getIndexes(data1.length);
-        ParallelSorter p1 = ParallelSorter.create(new Object[]{ data1, idx1 });
-        ParallelSorter p2 = ParallelSorter.create(new Object[]{ data2, idx2 });
-        p1.quickSort(0);
-        p2.mergeSort(0);
-        compare(data1, data2);
-        compare(idx1, idx2);
-        p1.quickSort(1);
-        compare(idx1, idx3);
-        compare(data1, data3);
-    }
-
-    private void compare(Object[] data1, Object[] data2) {
-        assertTrue(data1.length == data2.length);
-        for (int i = 0; i < data1.length; i++) {
-            assertTrue(data1[i].equals(data2[i]));
-        }
-    }
-
-    private void compare(int[] data1, int[] data2) {
-        assertTrue(data1.length == data2.length);
-        for (int i = 0; i < data1.length; i++) {
-            assertTrue(data1[i] == data2[i]);
-        }
-    }
-    
-    private int[] getIndexes(int len) {
-        int[] idx = new int[len];
-        for (int i = 0; i < len; i++) {
-            idx[i] = i;
-        }
-        return idx;
-    }
-
-    private Object[] getTestData() throws IOException {
-        InputStream in = getClass().getResourceAsStream("words.txt");
-        BufferedReader r = new BufferedReader(new InputStreamReader(in));
-        List list = new ArrayList();
-        String line;
+    private static int gcount(int x) {
         int c = 0;
-        while ((line = r.readLine()) != null) {
-            list.add(line);
-            if (c++ == 20) break;
+        while (x != 0) {
+            c++;
+            x &= (x - 1);
         }
-        return list.toArray();
+        return c;
     }
 
-    private Object[] copy(Object[] data) {
-        Object[] copy = new Object[data.length];
-        System.arraycopy(data, 0, copy, 0, data.length);
-        return copy;
+    static {
+        for(int j = 0; j < 256; j++) {
+            T[j] = gcount(j);
+        }
     }
 
-    public TestParallelSorter(String testName) {
-        super(testName);
+    private static int topbit(int i) {
+        int j;
+        for (j = 0; i != 0; i ^= j) {
+            j = i & -i;
+        }
+        return j;
+    }
+
+    private static int log2(int i) {
+        int j = 0;
+        for (j = 0; i != 0; i >>= 1) {
+            j++;
+        }
+        return j;
     }
     
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
+    public int length() {
+        return log2(topbit(value));
     }
-    
-    public static Test suite() {
-        return new TestSuite(TestParallelSorter.class);
+
+    public int cardinality() {
+        int w = value;
+        int c = 0;
+        while (w != 0) {
+            c += T[w & 255];
+            w >>= 8;
+        }
+        return c;
+    }
+
+    public boolean get(int index) {
+        return (value & (1 << index)) != 0;
+    }
+
+    public void set(int index) {
+        value |= (1 << index);
+    }
+
+    public void clear(int index) {
+        value &= ~(1 << index);
     }
 }

@@ -51,79 +51,47 @@
  * information on the Apache Software Foundation, please see
  * <http://www.apache.org/>.
  */
-package net.sf.cglib.util;
+package net.sf.cglib.core;
 
 import net.sf.cglib.CodeGenTestCase;
-import java.io.*;
-import java.lang.reflect.Method;
-import java.util.*;
 import junit.framework.*;
 
-/**
- * @author Chris Nokleberg <a href="mailto:chris@nokleberg.com">chris@nokleberg.com</a>
- * @version $Id: TestParallelSorter.java,v 1.2 2003-09-18 17:23:29 herbyderby Exp $
- */
-public class TestParallelSorter extends CodeGenTestCase {
-    public void testSorts() throws Throwable {
-        Object[] data1 = getTestData();
-        Object[] data2 = copy(data1);
-        Object[] data3 = copy(data1);
-        int[] idx1 = getIndexes(data1.length);
-        int[] idx2 = getIndexes(data1.length);
-        int[] idx3 = getIndexes(data1.length);
-        ParallelSorter p1 = ParallelSorter.create(new Object[]{ data1, idx1 });
-        ParallelSorter p2 = ParallelSorter.create(new Object[]{ data2, idx2 });
-        p1.quickSort(0);
-        p2.mergeSort(0);
-        compare(data1, data2);
-        compare(idx1, idx2);
-        p1.quickSort(1);
-        compare(idx1, idx3);
-        compare(data1, data3);
-    }
-
-    private void compare(Object[] data1, Object[] data2) {
-        assertTrue(data1.length == data2.length);
-        for (int i = 0; i < data1.length; i++) {
-            assertTrue(data1[i].equals(data2[i]));
-        }
-    }
-
-    private void compare(int[] data1, int[] data2) {
-        assertTrue(data1.length == data2.length);
-        for (int i = 0; i < data1.length; i++) {
-            assertTrue(data1[i] == data2[i]);
-        }
+public class TestTinyBitSet extends TestCase {
+    public void testGetSetClear() {
+        TinyBitSet b = new TinyBitSet();
+        assertTrue(!b.get(5));
+        b.set(5);
+        assertTrue(b.get(5));
+        b.clear(5);
+        assertTrue(!b.get(5));
     }
     
-    private int[] getIndexes(int len) {
-        int[] idx = new int[len];
-        for (int i = 0; i < len; i++) {
-            idx[i] = i;
-        }
-        return idx;
+    public void testLength() {
+        TinyBitSet b = new TinyBitSet();
+        b.set(10);
+        assertTrue(b.length() == 11);
+        b.set(15);
+        assertTrue(b.length() == 16);
+        b.set(14);
+        assertTrue(b.length() == 16);
     }
 
-    private Object[] getTestData() throws IOException {
-        InputStream in = getClass().getResourceAsStream("words.txt");
-        BufferedReader r = new BufferedReader(new InputStreamReader(in));
-        List list = new ArrayList();
-        String line;
-        int c = 0;
-        while ((line = r.readLine()) != null) {
-            list.add(line);
-            if (c++ == 20) break;
-        }
-        return list.toArray();
+    public void testCardinality() {
+        TinyBitSet b = new TinyBitSet();
+        assertTrue(b.cardinality() == 0);
+        b.set(1);
+        assertTrue(b.cardinality() == 1);
+        b.set(4);
+        assertTrue(b.cardinality() == 2);
+        b.set(10);
+        assertTrue(b.cardinality() == 3);
+        b.set(10);
+        assertTrue(b.cardinality() == 3);
+        b.clear(10);
+        assertTrue(b.cardinality() == 2);
     }
 
-    private Object[] copy(Object[] data) {
-        Object[] copy = new Object[data.length];
-        System.arraycopy(data, 0, copy, 0, data.length);
-        return copy;
-    }
-
-    public TestParallelSorter(String testName) {
+    public TestTinyBitSet(String testName) {
         super(testName);
     }
     
@@ -132,6 +100,6 @@ public class TestParallelSorter extends CodeGenTestCase {
     }
     
     public static Test suite() {
-        return new TestSuite(TestParallelSorter.class);
+        return new TestSuite(TestTinyBitSet.class);
     }
 }
