@@ -51,46 +51,32 @@
  * information on the Apache Software Foundation, please see
  * <http://www.apache.org/>.
  */
-package net.sf.cglib;
+package net.sf.cglib.util;
 
-import java.lang.reflect.Method;
+public class Block
+{
+    private Block parent;
+    private Label start;
+    private Label end;
+    
+    public Block(Block parent, Label start) {
+        this.parent = parent;
+        this.start = start;
+    }
 
-/**
- * @version $Id: MethodConstants.java,v 1.10 2003-01-31 01:18:50 herbyderby Exp $
- */
-abstract class MethodConstants {
-    public static final Method EQUALS =
-      ReflectUtils.findMethod("Object.equals(Object)");
-    public static final Method GET_DECLARED_METHOD =
-      ReflectUtils.findMethod("Class.getDeclaredMethod(String, Class[])");
-    public static final Method GET_DECLARED_CONSTRUCTOR = 
-      ReflectUtils.findMethod("Class.getDeclaredConstructor(Class[])");
-    public static final Method HASH_CODE =
-      ReflectUtils.findMethod("Object.hashCode()");
-    public static final Method FLOAT_TO_INT_BITS =
-      ReflectUtils.findMethod("Float.floatToIntBits(float)");
-    public static final Method DOUBLE_TO_LONG_BITS =
-      ReflectUtils.findMethod("Double.doubleToLongBits(double)");
-    public static final Method FOR_NAME =
-      ReflectUtils.findMethod("Class.forName(String)");
-    public static final Method THROWABLE_GET_MESSAGE =
-      ReflectUtils.findMethod("Throwable.getMessage()");
-    public static final Method DEFINE_CLASS =
-      ReflectUtils.findMethod("ClassLoader.defineClass( byte[], int, int)");
-    public static final Method BOOLEAN_VALUE =
-      ReflectUtils.findMethod("Boolean.booleanValue()");
-    public static final Method CHAR_VALUE =
-      ReflectUtils.findMethod("Character.charValue()");
-    public static final Method LONG_VALUE =
-      ReflectUtils.findMethod("Number.longValue()");
-    public static final Method DOUBLE_VALUE =
-      ReflectUtils.findMethod("Number.doubleValue()");
-    public static final Method FLOAT_VALUE =
-      ReflectUtils.findMethod("Number.floatValue()");
-    public static final Method INT_VALUE =
-      ReflectUtils.findMethod("Number.intValue()");
-    public static final Method MAP_PUT =
-      ReflectUtils.findMethod("java.util.Map.put(Object,Object)");
-    public static final Method MAP_GET =
-      ReflectUtils.findMethod("java.util.Map.get(Object)");
+    public Block getParent() {
+        return parent;
+    }
+
+    public Label getStart() {
+        return start;
+    }
+
+    public Label getEnd() {
+        return end;
+    }
+
+    public void setEnd(Label end) {
+        this.end = end;
+    }
 }

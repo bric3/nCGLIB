@@ -51,19 +51,23 @@
  * information on the Apache Software Foundation, please see
  * <http://www.apache.org/>.
  */
-package net.sf.cglib;
+package net.sf.cglib.util;
 
-/**
- * @author Juozas Baliuka <a href="mailto:baliuka@mwm.lt">baliuka@mwm.lt</a>
- * @version $Id: Constants.java,v 1.3 2003-01-31 01:18:51 herbyderby Exp $
- */
-abstract  class Constants {
-    public static final Class[] TYPES_OBJECT = { Object.class };
-    public static final Class[] TYPES_EMPTY = {};
-    public static final Class[] TYPES_OBJECT_ARRAY = { Object[].class };
-    public static final Class[] TYPES_STRING = { String.class };
-    public static final Class[] TYPES_THROWABLE = { Throwable.class };
-    public static final String CONSTRUCTOR_NAME = "<init>";
-    public static final String SOURCE_FILE = "<generated>";
-    public static final String STATIC_NAME = "<clinit>";
+public class Local
+{
+    private Class type;
+    private int index;
+    
+    public Local(Class type, int index) {
+        this.type = type;
+        this.index = index;
+    }
+    
+    public int getIndex() {
+        return index;
+    }
+
+    public Class getType() {
+        return type;
+    }
 }

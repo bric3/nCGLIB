@@ -51,36 +51,22 @@
  * information on the Apache Software Foundation, please see
  * <http://www.apache.org/>.
  */
-package net.sf.cglib;
+package net.sf.cglib.util;
 
-import java.lang.reflect.Member;
-import java.lang.reflect.Modifier;
-import net.sf.cglib.util.ReflectUtils;
+/**
+ * @version $Id: ClassNameFactory.java,v 1.1 2003-06-13 21:12:49 herbyderby Exp $
+ */
+public class ClassNameFactory {
+    private final String suffix;
+    private int index = 0;
 
-public class VisibilityFilter implements MethodFilter {
-    private String pkg;
-    
-    public VisibilityFilter(Class source) {
-        pkg = ReflectUtils.getPackageName(source);
+    public ClassNameFactory(String suffix) {
+        this.suffix = suffix;
     }
-    
-    public boolean accept(Member member) {
-        int mod = member.getModifiers();
-        if (Modifier.isStatic(mod) || Modifier.isPrivate(mod)) {
-            return false;
-        }
-        if (Modifier.isProtected(mod) || Modifier.isPublic(mod)) {
-            return true;
-        }
-        return pkg.equals(ReflectUtils.getPackageName(member.getDeclaringClass()));
-    }
-    
-    public int hashCode() {
-        return pkg.hashCode();
-    }
-    
-    public boolean equals(Object obj){
-        return pkg.equals(((VisibilityFilter)obj).pkg);
+
+    public String getNextName(Class cls) {
+        String className = cls.getName() + "$$" + suffix + "$$";
+        className += index++;
+        return className;
     }
 }
-
