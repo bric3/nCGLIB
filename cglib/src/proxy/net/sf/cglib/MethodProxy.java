@@ -64,44 +64,29 @@ import net.sf.cglib.reflect.*;
  * object of the same type.
  * @see Enhancer
  * @see MethodInterceptor
- * @version $Id: MethodProxy.java,v 1.25 2003-09-10 17:49:10 herbyderby Exp $
+ * @version $Id: MethodProxy.java,v 1.26 2003-09-10 20:15:30 herbyderby Exp $
  */
 public class MethodProxy {
-    private Invocable method;
-    private Invocable superMethod;
+    private String m1;
+    private String m2;
+    private FastClass f1;
+    private FastClass f2;
+    private int i1;
+    private int i2;
 
-    public static MethodProxy create(Method method, Method superMethod) {
-        return new MethodProxy(method, superMethod);
+    // TODO: get rid of create, call constructor directly
+    public static MethodProxy create(Class c1, String m1, Class c2, String m2) {
+        return new MethodProxy(c1, m1, c2, m2);
     }
 
-    protected MethodProxy(Method method, Method superMethod) {
-        ClassLoader loader = superMethod.getDeclaringClass().getClassLoader();
-        this.method = createMethod(method);
-        this.superMethod = createMethod(superMethod);
-    }
-
-    private static Invocable createMethod(Method method) {
-        if (Modifier.isProtected(method.getModifiers())) {
-            final String sig = ReflectUtils.getMethodDescriptor(method);
-            return new Invocable() {
-                public Object invoke(Object obj, Object[] args) throws IllegalAccessException {
-                    throw new IllegalAccessException("Protected method: " + sig);
-                }
-            };
-        }
-        return FastClass.create(method.getDeclaringClass()).getMethod(method);
-    }
-
-    /**
-     * Invoke the original (super) method on the specified object.
-     * @param obj the enhanced object, must be the object passed as the first
-     * argument to the MethodInterceptor
-     * @param args the arguments passed to the intercepted method; you may substitute a different
-     * argument array as long as the types are compatible
-     * @see MethodInterceptor#intercept
-     */
-    public Object invokeSuper(Object obj, Object[] args) throws Throwable {
-        return superMethod.invoke(obj, args);
+    private MethodProxy(Class c1, String m1, Class c2, String m2) {
+        this.m1 = m1;
+        this.m2 = m2;
+        this.f1 = FastClass.create(c1);
+        this.f2 = FastClass.create(c2);
+        i1 = f1.getIndex(m1);
+        i2 = f2.getIndex(m2);
+        // TODO: handle protected method exception here instead of inside invoke
     }
 
     /**
@@ -113,6 +98,26 @@ public class MethodProxy {
      * @see MethodInterceptor#intercept
      */
     public Object invoke(Object obj, Object[] args) throws Throwable {
-        return method.invoke(obj, args);
+        if (i1 == -1) {
+            throw new IllegalAccessException("Protected method: " + m1);
+        } else {
+            return f1.invoke(i1, obj, args);
+        }
+    }
+
+    /**
+     * Invoke the original (super) method on the specified object.
+     * @param obj the enhanced object, must be the object passed as the first
+     * argument to the MethodInterceptor
+     * @param args the arguments passed to the intercepted method; you may substitute a different
+     * argument array as long as the types are compatible
+     * @see MethodInterceptor#intercept
+     */
+    public Object invokeSuper(Object obj, Object[] args) throws Throwable {
+        if (i2 == -1) {
+            throw new IllegalAccessException("Protected method: " + m2);
+        } else {
+            return f2.invoke(i2, obj, args);
+        }
     }
 }

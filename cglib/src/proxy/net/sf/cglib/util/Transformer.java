@@ -53,28 +53,6 @@
  */
 package net.sf.cglib.util;
 
-import java.lang.reflect.*;
-
-public class VisibilityPredicate implements Predicate {
-    private boolean protectedOk;
-    private String pkg;
-
-    public VisibilityPredicate(Class source, boolean protectedOk) {
-        this.protectedOk = protectedOk;
-        pkg = ReflectUtils.getPackageName(source);
-    }
-
-    public boolean evaluate(Object arg) {
-        int mod = ((Member)arg).getModifiers();
-        if (Modifier.isStatic(mod) || Modifier.isPrivate(mod)) {
-            return false;
-        } else if (Modifier.isPublic(mod)) {
-            return true;
-        } else if (Modifier.isProtected(mod)) {
-            return protectedOk;
-        } else {
-            return pkg.equals(ReflectUtils.getPackageName(((Member)arg).getDeclaringClass()));
-        }
-    }
+public interface Transformer {
+    Object transform(Object value);
 }
-

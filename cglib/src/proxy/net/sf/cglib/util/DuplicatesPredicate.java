@@ -51,10 +51,15 @@
  * information on the Apache Software Foundation, please see
  * <http://www.apache.org/>.
  */
-package net.sf.cglib.reflect;
+package net.sf.cglib.util;
 
-public interface Invocable
-{
-    // TODO: change throws clause
-    Object invoke(Object obj, Object[] args) throws Throwable;
+import java.lang.reflect.Method;
+import java.util.*;
+
+public class DuplicatesPredicate implements Predicate {
+    private Set unique = new HashSet();
+
+    public boolean evaluate(Object arg) {
+        return unique.add(MethodWrapper.create((Method)arg));
+    }
 }
