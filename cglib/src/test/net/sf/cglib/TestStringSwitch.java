@@ -53,41 +53,82 @@
  */
 package net.sf.cglib;
 
+import java.lang.reflect.Method;
+import java.util.*;
+import net.sf.cglib.util.*;
 import junit.framework.*;
 
-/**
- *@author     Gerhard Froehlich <a href="mailto:g-froehlich@gmx.de">
- *      g-froehlich@gmx.de</a>
- *@version    $Id: TestAll.java,v 1.17 2003-06-16 17:06:58 herbyderby Exp $
- */
-public class TestAll extends TestCase {
-    public TestAll(String testName) {
+public class TestStringSwitch extends CodeGenTestCase {
+    private static int index = 0;
+
+    public static interface Indexed {
+        int getIndex(String word);
+    }
+
+    public void testSimple() {
+        String[] keys = new String[]{ "foo", "bar", "baz", "quud", "quick", "quip" };
+
+        Class created = create(keys);
+        Indexed test = (Indexed)ReflectUtils.newInstance(created);
+        assertTrue(test.getIndex("foo") == 'o');
+        assertTrue(test.getIndex("bar") == 'r');
+        assertTrue(test.getIndex("baz") == 'z');
+        assertTrue(test.getIndex("quud") == 'd');
+        assertTrue(test.getIndex("quick") == 'k');
+        assertTrue(test.getIndex("quip") == 'p');
+        assertTrue(test.getIndex("q") == 0);
+        assertTrue(test.getIndex("qu") == 0);
+        assertTrue(test.getIndex("fop") == 0);
+        assertTrue(test.getIndex("quicker") == 0);
+        assertTrue(test.getIndex("herby") == 0);
+        assertTrue(test.getIndex("herbyderby") == 0);
+        assertTrue(test.getIndex("") == 0);
+    }
+
+    public static Class create(String[] keys) {
+        return new Generator(keys).define();
+    }
+
+    private static class Generator extends CodeGenerator {
+        private String[] keys;
+
+        public Generator(String[] keys) {
+            super("TestStringSwitch" + index++,
+                  Object.class,
+                  TestStringSwitch.class.getClassLoader());
+            this.keys = keys;
+            addInterface(Indexed.class);
+        }
+
+        protected void generate() throws Exception {
+            null_constructor();
+
+            Method method = Indexed.class.getMethod("getIndex", new Class[]{ String.class });
+            begin_method(method);
+            load_arg(0);
+            string_switch(keys, new StringSwitchCallback() {
+                    public void processCase(String key, Label end) {
+                        push((int)key.charAt(key.length() - 1));
+                        goTo(end);
+                    }
+                    public void processDefault() {
+                        push(0);
+                    }
+                });
+            return_value();
+            end_method();
+        }
+    }
+
+    public TestStringSwitch(String testName) {
         super(testName);
     }
-
-    public static Test suite() {
-       
-        // System.setSecurityManager( new java.rmi.RMISecurityManager());
-        
-        System.getProperties().list(System.out);
-        TestSuite suite = new TestSuite();
-//         suite.addTest(TestEnhancer.suite());
-//         suite.addTest(TestMetaClass.suite());
-//         suite.addTest(TestDelegator.suite());
-//         suite.addTest(TestKeyFactory.suite());
-//         suite.addTest(TestProxy.suite());
-//         suite.addTest(TestMethodProxy.suite());
-//         suite.addTest(TestParallelSorter.suite());
-//         suite.addTest(TestInterface.suite());
-//         suite.addTest(TestSwitch.suite());
-        suite.addTest(TestStringSwitch.suite());
-           
-        return suite;
+    
+    public static void main(String[] args) {
+        junit.textui.TestRunner.run(suite());
     }
-
-    public static void main(String args[]) {
-        String[] testCaseName = {TestAll.class.getName()};
-        junit.textui.TestRunner.main(testCaseName);
+    
+    public static Test suite() {
+        return new TestSuite(TestStringSwitch.class);
     }
 }
-

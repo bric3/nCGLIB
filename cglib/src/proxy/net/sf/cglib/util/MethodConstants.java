@@ -56,7 +56,7 @@ package net.sf.cglib.util;
 import java.lang.reflect.Method;
 
 /**
- * @version $Id: MethodConstants.java,v 1.1 2003-06-13 21:12:49 herbyderby Exp $
+ * @version $Id: MethodConstants.java,v 1.2 2003-06-16 17:06:59 herbyderby Exp $
  */
 public class MethodConstants {
     private MethodConstants() { }
@@ -78,7 +78,7 @@ public class MethodConstants {
     public static final Method THROWABLE_GET_MESSAGE =
       ReflectUtils.findMethod("Throwable.getMessage()");
     public static final Method DEFINE_CLASS =
-      ReflectUtils.findMethod("ClassLoader.defineClass( byte[], int, int)");
+      ReflectUtils.findMethod("ClassLoader.defineClass(byte[], int, int)");
     public static final Method BOOLEAN_VALUE =
       ReflectUtils.findMethod("Boolean.booleanValue()");
     public static final Method CHAR_VALUE =
@@ -92,7 +92,13 @@ public class MethodConstants {
     public static final Method INT_VALUE =
       ReflectUtils.findMethod("Number.intValue()");
     public static final Method MAP_PUT =
-      ReflectUtils.findMethod("java.util.Map.put(Object,Object)");
+      ReflectUtils.findMethod("java.util.Map.put(Object, Object)");
     public static final Method MAP_GET =
       ReflectUtils.findMethod("java.util.Map.get(Object)");
+    public static final Method STRING_LENGTH =
+      ReflectUtils.findMethod("String.length()");
+    public static final Method STRING_CHAR_AT =
+      ReflectUtils.findMethod("String.charAt(int)");
+    public static final Method MAP_KEY_SET =
+      ReflectUtils.findMethod("java.util.Map.keySet()");
 }

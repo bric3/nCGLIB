@@ -53,41 +53,22 @@
  */
 package net.sf.cglib;
 
-import junit.framework.*;
+import java.util.*;
 
-/**
- *@author     Gerhard Froehlich <a href="mailto:g-froehlich@gmx.de">
- *      g-froehlich@gmx.de</a>
- *@version    $Id: TestAll.java,v 1.17 2003-06-16 17:06:58 herbyderby Exp $
- */
-public class TestAll extends TestCase {
-    public TestAll(String testName) {
-        super(testName);
+class FixedKeySet extends AbstractSet {
+    private Set set;
+    private int size;
+
+    public FixedKeySet(String[] keys) {
+        size = keys.length;
+        set = Collections.unmodifiableSet(new HashSet(Arrays.asList(keys)));
     }
 
-    public static Test suite() {
-       
-        // System.setSecurityManager( new java.rmi.RMISecurityManager());
-        
-        System.getProperties().list(System.out);
-        TestSuite suite = new TestSuite();
-//         suite.addTest(TestEnhancer.suite());
-//         suite.addTest(TestMetaClass.suite());
-//         suite.addTest(TestDelegator.suite());
-//         suite.addTest(TestKeyFactory.suite());
-//         suite.addTest(TestProxy.suite());
-//         suite.addTest(TestMethodProxy.suite());
-//         suite.addTest(TestParallelSorter.suite());
-//         suite.addTest(TestInterface.suite());
-//         suite.addTest(TestSwitch.suite());
-        suite.addTest(TestStringSwitch.suite());
-           
-        return suite;
+    public Iterator iterator() {
+        return set.iterator();
     }
 
-    public static void main(String args[]) {
-        String[] testCaseName = {TestAll.class.getName()};
-        junit.textui.TestRunner.main(testCaseName);
+    public int size() {
+        return size;
     }
 }
-
