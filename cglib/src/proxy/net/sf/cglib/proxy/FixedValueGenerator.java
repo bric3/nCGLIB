@@ -53,8 +53,6 @@
  */
 package net.sf.cglib.proxy;
 
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
 import java.util.*;
 import net.sf.cglib.core.*;
 import org.objectweb.asm.Type;
@@ -68,11 +66,8 @@ class FixedValueGenerator implements CallbackGenerator {
 
     public void generate(ClassEmitter ce, final Context context) {
         for (Iterator it = context.getMethods(); it.hasNext();) {
-            Method method = (Method)it.next();
-            CodeEmitter e = ce.begin_method(context.getModifiers(method),
-                                            ReflectUtils.getSignature(method),
-                                            ReflectUtils.getExceptionTypes(method),
-                                            null);
+            MethodInfo method = (MethodInfo)it.next();
+            CodeEmitter e = EmitUtils.begin_method(ce, method);
             context.emitCallback(e, context.getIndex(method));
             e.invoke_interface(FIXED_VALUE, LOAD_OBJECT);
             e.unbox_or_zero(e.getReturnType());

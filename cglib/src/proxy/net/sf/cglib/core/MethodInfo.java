@@ -53,53 +53,59 @@
  */
 package net.sf.cglib.core;
 
-import java.util.*;
-import java.lang.reflect.Array;
+import org.objectweb.asm.Attribute;
+import org.objectweb.asm.Type;
 
-/**
- * @author Chris Nokleberg
- * @version $Id: CollectionUtils.java,v 1.5 2004-04-07 07:01:00 herbyderby Exp $
- */
-public class CollectionUtils {
-    private CollectionUtils() { }
+public class MethodInfo {
+    private ClassInfo classInfo;
+    private int modifiers;
+    private Signature sig;
+    private Type[] exceptions;
+    private Attribute attrs;
 
-    public static Map bucket(Collection c, Transformer t) {
-        Map buckets = new HashMap();
-        for (Iterator it = c.iterator(); it.hasNext();) {
-            Object value = (Object)it.next();
-            Object key = t.transform(value);
-            List bucket = (List)buckets.get(key);
-            if (bucket == null) {
-                buckets.put(key, bucket = new LinkedList());
-            }
-            bucket.add(value);
-        }
-        return buckets;
+    public MethodInfo(ClassInfo classInfo, int modifiers, Signature sig, Type[] exceptions, Attribute attrs) {
+        // TODO: null checking
+        this.classInfo = classInfo;
+        this.modifiers = modifiers;
+        this.sig = sig;
+        this.exceptions = exceptions;
+        this.attrs = attrs;
     }
 
-    public static void reverse(Map source, Map target) {
-        for (Iterator it = source.keySet().iterator(); it.hasNext();) {
-            Object key = it.next();
-            target.put(source.get(key), key);
-        }
+    public ClassInfo getClassInfo() {
+        return classInfo;
     }
-
-    public static Collection filter(Collection c, Predicate p) {
-        Iterator it = c.iterator();
-        while (it.hasNext()) {
-            if (!p.evaluate(it.next())) {
-                it.remove();
-            }
-        }
-        return c;
-    }
-
-    public static List transform(Collection c, Transformer t) {
-        List result = new ArrayList(c.size());
-        for (Iterator it = c.iterator(); it.hasNext();) {
-            result.add(t.transform(it.next()));
-        }
-        return result;
-    }
-}    
     
+    public int getModifiers() {
+        return modifiers;
+    }
+
+    public Signature getSignature() {
+        return sig;
+    }
+
+    public Type[] getExceptionTypes() {
+        return exceptions;
+    }
+
+    public Attribute getAttribute() {
+        return attrs;
+    }
+
+    public boolean equals(Object o) {
+        if (o == null)
+            return false;
+        if (!(o instanceof MethodInfo))
+            return false;
+        return getSignature().equals(((MethodInfo)o).getSignature());
+    }
+
+    public int hashCode() {
+        return getSignature().hashCode();
+    }
+
+    public String toString() {
+        // TODO: include modifiers, exceptions
+        return sig.toString();
+    }
+}

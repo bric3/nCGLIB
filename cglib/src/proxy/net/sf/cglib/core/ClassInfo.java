@@ -53,53 +53,52 @@
  */
 package net.sf.cglib.core;
 
-import java.util.*;
-import java.lang.reflect.Array;
+import org.objectweb.asm.Attribute;
+import org.objectweb.asm.Type;
 
-/**
- * @author Chris Nokleberg
- * @version $Id: CollectionUtils.java,v 1.5 2004-04-07 07:01:00 herbyderby Exp $
- */
-public class CollectionUtils {
-    private CollectionUtils() { }
+public class ClassInfo {
+    private Type type;
+    private Type superType;
+    private int modifiers;
+    private Type[] interfaces;
 
-    public static Map bucket(Collection c, Transformer t) {
-        Map buckets = new HashMap();
-        for (Iterator it = c.iterator(); it.hasNext();) {
-            Object value = (Object)it.next();
-            Object key = t.transform(value);
-            List bucket = (List)buckets.get(key);
-            if (bucket == null) {
-                buckets.put(key, bucket = new LinkedList());
-            }
-            bucket.add(value);
-        }
-        return buckets;
+    public ClassInfo(int modifiers, String name, Type superType, Type[] interfaces) {
+        this.modifiers = modifiers;
+        this.superType = superType;
+        this.interfaces = interfaces;
+        type = TypeUtils.parseType(name);
     }
 
-    public static void reverse(Map source, Map target) {
-        for (Iterator it = source.keySet().iterator(); it.hasNext();) {
-            Object key = it.next();
-            target.put(source.get(key), key);
-        }
+    public Type getType() {
+        return type;
     }
 
-    public static Collection filter(Collection c, Predicate p) {
-        Iterator it = c.iterator();
-        while (it.hasNext()) {
-            if (!p.evaluate(it.next())) {
-                it.remove();
-            }
-        }
-        return c;
+    public Type getSuperType() {
+        return superType;
     }
 
-    public static List transform(Collection c, Transformer t) {
-        List result = new ArrayList(c.size());
-        for (Iterator it = c.iterator(); it.hasNext();) {
-            result.add(t.transform(it.next()));
-        }
-        return result;
+    public Type[] getInterfaces() {
+        return interfaces;
     }
-}    
     
+    public int getModifiers() {
+        return modifiers;
+    }
+
+    public boolean equals(Object o) {
+        if (o == null)
+            return false;
+        if (!(o instanceof ClassInfo))
+            return false;
+        return getType().equals(((ClassInfo)o).getType());
+    }
+
+    public int hashCode() {
+        return getType().hashCode();
+    }
+
+    public String toString() {
+        // TODO: include modifiers, superType, interfaces
+        return getType().getClassName();
+    }
+}

@@ -53,53 +53,23 @@
  */
 package net.sf.cglib.core;
 
-import java.util.*;
-import java.lang.reflect.Array;
+import java.lang.reflect.*;
 
-/**
- * @author Chris Nokleberg
- * @version $Id: CollectionUtils.java,v 1.5 2004-04-07 07:01:00 herbyderby Exp $
- */
-public class CollectionUtils {
-    private CollectionUtils() { }
+public class MethodInfoTransformer implements Transformer
+{
+    private static final MethodInfoTransformer INSTANCE = new MethodInfoTransformer();
 
-    public static Map bucket(Collection c, Transformer t) {
-        Map buckets = new HashMap();
-        for (Iterator it = c.iterator(); it.hasNext();) {
-            Object value = (Object)it.next();
-            Object key = t.transform(value);
-            List bucket = (List)buckets.get(key);
-            if (bucket == null) {
-                buckets.put(key, bucket = new LinkedList());
-            }
-            bucket.add(value);
-        }
-        return buckets;
+    public static MethodInfoTransformer getInstance() {
+        return INSTANCE;
     }
-
-    public static void reverse(Map source, Map target) {
-        for (Iterator it = source.keySet().iterator(); it.hasNext();) {
-            Object key = it.next();
-            target.put(source.get(key), key);
-        }
-    }
-
-    public static Collection filter(Collection c, Predicate p) {
-        Iterator it = c.iterator();
-        while (it.hasNext()) {
-            if (!p.evaluate(it.next())) {
-                it.remove();
-            }
-        }
-        return c;
-    }
-
-    public static List transform(Collection c, Transformer t) {
-        List result = new ArrayList(c.size());
-        for (Iterator it = c.iterator(); it.hasNext();) {
-            result.add(t.transform(it.next()));
-        }
-        return result;
-    }
-}    
     
+    public Object transform(Object value) {
+        if (value instanceof Method) {
+            return ReflectUtils.getMethodInfo((Method)value);
+        } else if (value instanceof Constructor) {
+            return ReflectUtils.getMethodInfo((Constructor)value);
+        } else {
+            throw new IllegalArgumentException("cannot get method info for " + value);
+        }
+    }
+}
