@@ -63,7 +63,7 @@ import net.sf.cglib.transform.*;
 /**
  *@author     Gerhard Froehlich <a href="mailto:g-froehlich@gmx.de">
  *      g-froehlich@gmx.de</a>
- *@version    $Id: TestAll.java,v 1.34 2003-09-15 19:31:22 herbyderby Exp $
+ *@version    $Id: TestAll.java,v 1.35 2003-09-17 20:44:27 herbyderby Exp $
  */
 public class TestAll extends TestCase {
     public TestAll(String testName) {
@@ -77,26 +77,33 @@ public class TestAll extends TestCase {
         System.getProperties().list(System.out);
         TestSuite suite = new TestSuite();
 
+        // root
         suite.addTest(TestEnhancer.suite());
         suite.addTest(TestProxy.suite());
         suite.addTest(TestDispatcher.suite());
         suite.addTest(TestLazyLoader.suite());
         suite.addTest(TestNoOp.suite());
-
         suite.addTest(TestMixin.suite());
 
+        // beans
         suite.addTest(TestBulkBean.suite());
         suite.addTest(TestBeanMap.suite());
-        
+
+        // reflect
         suite.addTest(TestDelegates.suite());
         suite.addTest(TestFastClass.suite());
 
+        // core
         suite.addTest(TestKeyFactory.suite());
         suite.addTest(TestSwitch.suite());
         suite.addTest(TestStringSwitch.suite());
         suite.addTest(TestMemberSwitch.suite());
 
+        // util
         suite.addTest(TestParallelSorter.suite());
+
+        // transform
+        suite.addTest(TestTransformingLoader.suite());
 
         return suite;
     }

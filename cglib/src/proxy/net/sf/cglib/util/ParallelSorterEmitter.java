@@ -67,7 +67,7 @@ class ParallelSorterEmitter extends Emitter {
 
     public ParallelSorterEmitter(ClassVisitor v, String className, Object[] arrays) throws Exception {
         setClassVisitor(v);
-        begin_class(Modifier.PUBLIC, className, ParallelSorter.class, null);
+        begin_class(Modifier.PUBLIC, className, ParallelSorter.class, null, Constants.SOURCE_FILE);
         Virt.null_constructor(this);
         Virt.factory_method(this, NEW_INSTANCE);
         generateConstructor(arrays);
