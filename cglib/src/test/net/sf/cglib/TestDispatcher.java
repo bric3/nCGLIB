@@ -53,23 +53,42 @@
  */
 package net.sf.cglib;
 
-import java.lang.reflect.Member;
+import java.beans.*;
 import java.lang.reflect.Method;
 import java.util.*;
+import junit.framework.*;
 
-public class NotFromObjectFilter implements MethodFilter {
-    public static final NotFromObjectFilter INSTANCE = new NotFromObjectFilter();
-    private static final Set OBJECT_METHODS = new HashSet();
+/**
+ * @author Chris Nokleberg
+ * @version $Id: TestDispatcher.java,v 1.1 2003-09-04 18:53:45 herbyderby Exp $
+ */
+public class TestDispatcher extends CodeGenTestCase {
+    public void testSimple() throws Exception {
+        final Map map = new HashMap();
+        map.put(DI1.class.getName(), new D1());
+        map.put(DI2.class.getName(), new D2());
 
-    static {
-        Method[] methods = Object.class.getMethods();
-        for (int i = 0; i < methods.length; i++) {
-            OBJECT_METHODS.add(MethodWrapper.create(methods[i]));
-        }
+        Dispatcher callback = new Dispatcher() {
+            public Object loadObject(String className) {
+                return map.get(className);
+            }
+        };
+        Object obj = Enhancer.enhance(Object.class,
+                                      new Class[]{ DI1.class, DI2.class },
+                                      callback);
+        assertTrue(((DI1)obj).herby().equals("D1"));
+        assertTrue(((DI2)obj).derby().equals("D2"));
+    }
+
+    public TestDispatcher(String testName) {
+        super(testName);
     }
     
-    public boolean accept(Member method) {
-        return !OBJECT_METHODS.contains(MethodWrapper.create((Method)method));
+    public static void main(String[] args) {
+        junit.textui.TestRunner.run(suite());
+    }
+    
+    public static Test suite() {
+        return new TestSuite(TestDispatcher.class);
     }
 }
-

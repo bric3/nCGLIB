@@ -53,46 +53,8 @@
  */
 package net.sf.cglib;
 
-import junit.framework.*;
-import java.lang.reflect.Method;
-import java.beans.*;
-import java.util.*;
-
-/**
- * @author Chris Nokleberg
- * @version $Id: TestInterface.java,v 1.2 2003-05-23 23:20:55 herbyderby Exp $
- */
-public class TestInterface extends CodeGenTestCase {
-    public void testStandalone() throws Exception {
-        Class iface = InterfaceMaker.create(new Class[]{D1.class, D2.class}, null);
-        Method[] methods = iface.getMethods();
-        assertTrue(methods.length == 2);
-        String name1 = methods[0].getName();
-        String name2 = methods[1].getName();
-        assertTrue(("herby".equals(name1) && "derby".equals(name2)) ||
-                   ("herby".equals(name2) && "derby".equals(name1)));
-    }
-
-    public void testEnhancer() throws Exception {
-        Class iface = InterfaceMaker.create(new Class[]{D1.class, D2.class}, null);
-        Object obj = Enhancer.enhance(Object.class, new Class[]{ iface }, new MethodInterceptor() {
-                public Object intercept(Object obj, Method method, Object[] args, MethodProxy proxy) {
-                    return "test";
-                }
-            });
-        Method method = obj.getClass().getMethod("herby", null);
-        assertTrue("test".equals(method.invoke(obj, null)));
-    }
-
-    public TestInterface(String testName) {
-        super(testName);
-    }
-    
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
-    }
-    
-    public static Test suite() {
-        return new TestSuite(TestInterface.class);
-    }
+public interface Dispatcher
+extends Callback
+{
+    Object loadObject(String className) throws Exception;
 }

@@ -53,41 +53,23 @@
  */
 package net.sf.cglib;
 
-import java.beans.*;
 import java.lang.reflect.Method;
-import java.util.*;
-import junit.framework.*;
 
-/**
- * @author Chris Nokleberg
- * @version $Id: TestLookupDelegator.java,v 1.1 2003-07-08 05:56:45 herbyderby Exp $
- */
-public class TestLookupDelegator extends CodeGenTestCase {
-    public void testSimple() throws Exception {
-        final Map map = new HashMap();
-        map.put(DI1.class.getName(), new D1());
-        map.put(DI2.class.getName(), new D2());
-        LookupDelegator.Callback callback = new LookupDelegator.Callback() {
-            public Object lookupDelegate(String className) {
-                return map.get(className);
-            }
-        };
-        Object obj = LookupDelegator.create(new Class[]{ DI1.class, DI2.class },
-                                            callback,
-                                            null);
-        assertTrue(((DI1)obj).herby().equals("D1"));
-        assertTrue(((DI2)obj).derby().equals("D2"));
+class HandlerAdapter implements BeforeAfterInterceptor {
+    InvocationHandler handler;
+
+    public HandlerAdapter(InvocationHandler handler) {
+        this.handler = handler;
     }
 
-    public TestLookupDelegator(String testName) {
-        super(testName);
+    public boolean invokeSuper(Object obj, Method method, Object[] args) {
+        return false;
     }
-    
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run(suite());
-    }
-    
-    public static Test suite() {
-        return new TestSuite(TestLookupDelegator.class);
+
+    public Object afterReturn(Object obj, Method method, Object[] args,
+                              boolean invokedSuper, Object retValFromSuper,
+                              Throwable e) throws Throwable {
+        return handler.invoke(obj, method, args);
     }
 }
+
