@@ -51,30 +51,39 @@
  * information on the Apache Software Foundation, please see
  * <http://www.apache.org/>.
  */
-package net.sf.cglib;
+package net.sf.cglib.beans;
 
-public class MemberSwitchBean {
-    public int init = -1;
-    
-    public MemberSwitchBean() { init = 0; }
-    public MemberSwitchBean(double foo) { init = 1; }
-    public MemberSwitchBean(int foo) { init = 2; }
-    public MemberSwitchBean(int foo, String bar, String baz) { init = 3; }
-    public MemberSwitchBean(int foo, String bar, double baz) { init = 4; }
-    public MemberSwitchBean(int foo, short bar, long baz) { init = 5; }
-    public MemberSwitchBean(int foo, String bar) { init = 6; }
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
+import java.util.Map;
 
-    public int foo() { return 0; }
-    public int foo(double foo) { return 1; }
-    public int foo(int foo) { return 2; }
-    public int foo(int foo, String bar, String baz) { return 3; }
-    public int foo(int foo, String bar, double baz) { return 4; }
-    public int foo(int foo, short bar, long baz) { return 5; }
-    public int foo(int foo, String bar) { return 6; }
+/**
+ * @author Chris Nokleberg <a href="mailto:chris@nokleberg.com">chris@nokleberg.com</a>
+ * @version $Id: BeanMapProxy.java,v 1.1 2003-09-14 17:14:04 herbyderby Exp $
+ */
+public class BeanMapProxy implements InvocationHandler {
+    private Map map;
 
-    public int bar() { return 7; }
-    public int bar(double foo) { return 8; }
+    public static Object newInstance(Map map, Class[] interfaces) {
+        return Proxy.newProxyInstance(map.getClass().getClassLoader(),
+                                      interfaces,
+                                      new BeanMapProxy(map));
+    }
 
-    int pkg() { return 9; }
+    public BeanMapProxy(Map map) {
+        this.map = map;
+    }
+
+    public Object invoke(Object proxy, Method m, Object[] args) throws Throwable {
+        String name = m.getName();
+        if (name.startsWith("get")) {
+            return map.get(name.substring(3));
+        } else if (name.startsWith("set")) {
+            map.put(name.substring(3), args[0]);
+            return null;
+        }
+        return null;
+    }
 }
 
