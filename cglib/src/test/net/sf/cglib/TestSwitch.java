@@ -1,7 +1,7 @@
 /*
  * The Apache Software License, Version 1.1
  *
- * Copyright (c) 2003 The Apache Software Foundation.  All rights
+ * Copyright (c) 2002 The Apache Software Foundation.  All rights
  * reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -51,34 +51,84 @@
  * information on the Apache Software Foundation, please see
  * <http://www.apache.org/>.
  */
-package net.sf.cglib.util;
+package net.sf.cglib;
 
-public interface CodeGeneratorBackend {
+import java.lang.reflect.Method;
+import java.util.*;
+import net.sf.cglib.util.*;
+import junit.framework.*;
 
-    void init(BasicCodeGenerator generator);
-    byte[] getBytes();
+public class TestSwitch extends CodeGenTestCase {
+    private static int index = 0;
+
+    public static interface Alphabet {
+        String getLetter(int index);
+    }
+
+    public void testAlphabet() {
+        int[] keys = new int[26];
     
-    void declare_field(int modifiers, Class type, String name);
+        for (int i = 0; i < 26; i++) {
+            keys[i] = i + 1;
+        }
+        String[] letters = new String[] {
+            "a", "b", "c", "d", "e", "f", "g", "h", "i", "k", "j", "l", "m",
+            "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z",
+        };
 
-    void emit(int opcode);
-    void emit(Label label);
-    void emit(int opcode, Label label);
-    void emit_var(int opcode, int index);
-    void emit_type(int opcode, String className);
-    void emit_int(int opcode, int value);
-    void emit_field(int opcode, String className, String fieldName, Class type);
-    void emit_invoke(int opcode, String className, String methodName, Class returnType, Class[] parameterTypes);
-    void emit_iinc(int index, int amount);
-    void emit_ldc(Object value);
-    void emit_switch(int[] keys, Label[] labels, Label def);
-    void emit_switch(int min, int max, Label[] labels, Label def);
+        Class created = create(keys, letters);
+        Alphabet alpha = (Alphabet)ReflectUtils.newInstance(created);
+        assertTrue("c".equals(alpha.getLetter(3)));
+        assertTrue("f".equals(alpha.getLetter(6)));
+        assertTrue("!".equals(alpha.getLetter(27)));
+    }
 
-    Label make_label();
-    Label mark();
-    void catch_exception(Block block, Class exceptionType);
+    public static Class create(int[] keys, String[] values) {
+        return new Generator(keys, values).define();
+    }
 
-    void begin_constructor(Class[] parameterTypes);
-    void begin_method(int modifiers, Class returnType, String name, Class[] parameterTypes, Class[] exceptionTypes);
-    void begin_static();
-    void end_method();
+    private static class Generator extends CodeGenerator {
+        private int[] keys;
+        private String[] values;
+
+        public Generator(int[] keys, String[] values) {
+            super("TestSwitch" + index++,
+                  Object.class,
+                  TestSwitch.class.getClassLoader());
+            this.keys = keys;
+            this.values = values;
+            addInterface(Alphabet.class);
+        }
+
+        protected void generate() throws Exception {
+            null_constructor();
+
+            Method method = Alphabet.class.getMethod("getLetter", new Class[]{ Integer.TYPE });
+            begin_method(method);
+            load_arg(0);
+            process_switch(keys, new ProcessSwitchCallback() {
+                    public void processCase(int index, Label end) {
+                        push(values[index - 1]);
+                        goTo(end);
+                    }
+                    public void processDefault() {
+                        push("!");
+                    }
+                });
+            return_value();
+            end_method();
+        }
+    }
+
+    public TestSwitch(String testName) {
+        super(testName);
+    }
+    
+    public static void main(String[] args) {
+        junit.textui.TestRunner.run(suite());
+    }
+    
+    public static Test suite() {
+        return new TestSuite(TestSwitch.class);
+    }
 }
