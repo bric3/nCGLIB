@@ -53,39 +53,23 @@
  */
 package net.sf.cglib;
 
-import junit.framework.*;
+import java.lang.reflect.Member;
+import java.lang.reflect.Method;
+import java.util.*;
 
-/**
- *@author     Gerhard Froehlich <a href="mailto:g-froehlich@gmx.de">
- *      g-froehlich@gmx.de</a>
- *@version    $Id: TestAll.java,v 1.15 2003-05-23 23:18:43 herbyderby Exp $
- */
-public class TestAll extends TestCase {
-    public TestAll(String testName) {
-        super(testName);
+public class NotFromObjectFilter implements MethodFilter {
+    public static final NotFromObjectFilter INSTANCE = new NotFromObjectFilter();
+    private static final Set OBJECT_METHODS = new HashSet();
+
+    static {
+        Method[] methods = Object.class.getMethods();
+        for (int i = 0; i < methods.length; i++) {
+            OBJECT_METHODS.add(MethodWrapper.create(methods[i]));
+        }
     }
-
-    public static Test suite() {
-       
-        // System.setSecurityManager( new java.rmi.RMISecurityManager());
-        
-        System.getProperties().list(System.out);
-        TestSuite suite = new TestSuite();
-        suite.addTest(TestEnhancer.suite());
-        suite.addTest(TestMetaClass.suite());
-        suite.addTest(TestDelegator.suite());
-        suite.addTest(TestKeyFactory.suite());
-        suite.addTest(TestProxy.suite());
-        suite.addTest(TestMethodProxy.suite());
-        suite.addTest(TestParallelSorter.suite());
-        suite.addTest(TestInterface.suite());
-           
-        return suite;
-    }
-
-    public static void main(String args[]) {
-        String[] testCaseName = {TestAll.class.getName()};
-        junit.textui.TestRunner.main(testCaseName);
+    
+    public boolean accept(Member method) {
+        return !OBJECT_METHODS.contains(MethodWrapper.create((Method)method));
     }
 }
 

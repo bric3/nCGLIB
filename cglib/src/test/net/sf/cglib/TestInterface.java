@@ -54,38 +54,45 @@
 package net.sf.cglib;
 
 import junit.framework.*;
+import java.lang.reflect.Method;
+import java.beans.*;
+import java.util.*;
 
 /**
- *@author     Gerhard Froehlich <a href="mailto:g-froehlich@gmx.de">
- *      g-froehlich@gmx.de</a>
- *@version    $Id: TestAll.java,v 1.15 2003-05-23 23:18:43 herbyderby Exp $
+ * @author Chris Nokleberg <a href="mailto:chris@nokleberg.com">chris@nokleberg.com</a>
+ * @version $Id: TestInterface.java,v 1.1 2003-05-23 23:18:43 herbyderby Exp $
  */
-public class TestAll extends TestCase {
-    public TestAll(String testName) {
+public class TestInterface extends CodeGenTestCase {
+    public void testStandalone() throws Exception {
+        Class iface = InterfaceMaker.create(new Class[]{D1.class, D2.class}, null);
+        Method[] methods = iface.getMethods();
+        assertTrue(methods.length == 2);
+        String name1 = methods[0].getName();
+        String name2 = methods[1].getName();
+        assertTrue(("herby".equals(name1) && "derby".equals(name2)) ||
+                   ("herby".equals(name2) && "derby".equals(name1)));
+    }
+
+    public void testEnhancer() throws Exception {
+        Class iface = InterfaceMaker.create(new Class[]{D1.class, D2.class}, null);
+        Object obj = Enhancer.enhance(Object.class, new Class[]{ iface }, new MethodInterceptor() {
+                public Object intercept(Object obj, Method method, Object[] args, MethodProxy proxy) {
+                    return "test";
+                }
+            });
+        Method method = obj.getClass().getMethod("herby", null);
+        assertTrue("test".equals(method.invoke(obj, null)));
+    }
+
+    public TestInterface(String testName) {
         super(testName);
     }
-
-    public static Test suite() {
-       
-        // System.setSecurityManager( new java.rmi.RMISecurityManager());
-        
-        System.getProperties().list(System.out);
-        TestSuite suite = new TestSuite();
-        suite.addTest(TestEnhancer.suite());
-        suite.addTest(TestMetaClass.suite());
-        suite.addTest(TestDelegator.suite());
-        suite.addTest(TestKeyFactory.suite());
-        suite.addTest(TestProxy.suite());
-        suite.addTest(TestMethodProxy.suite());
-        suite.addTest(TestParallelSorter.suite());
-        suite.addTest(TestInterface.suite());
-           
-        return suite;
+    
+    public static void main(String[] args) {
+        junit.textui.TestRunner.run(suite());
     }
-
-    public static void main(String args[]) {
-        String[] testCaseName = {TestAll.class.getName()};
-        junit.textui.TestRunner.main(testCaseName);
+    
+    public static Test suite() {
+        return new TestSuite(TestInterface.class);
     }
 }
-
