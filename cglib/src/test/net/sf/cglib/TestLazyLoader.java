@@ -53,28 +53,40 @@
  */
 package net.sf.cglib;
 
-/**
- * Callback that can be registered with an enhanced class.
- * @author Juozas Baliuka <a href="mailto:baliuka@mwm.lt">baliuka@mwm.lt</a>
- * @version $Id: MethodInterceptor.java,v 1.7 2003-08-27 16:51:53 herbyderby Exp $
- */
-public interface MethodInterceptor
-extends Callback
-{
-    /**
-     * All generated proxied methods call this method instead of the original method.
-     * The original method may either be invoked by normal reflection using the Method object,
-     * or by using the MethodProxy (faster).
-     * @param obj "this", the enhanced object
-     * @param method intercepted Method
-     * @param args argument array; primitive types are wrapped
-     * @param proxy used to invoke super (non-intercepted method); may be called
-     * as many times as needed
-     * @throws Throwable any exception may be thrown; if so, super method will not be invoked
-     * @return any value compatible with the signature of the proxied method. Method returning void will ignore this value.
-     * @see MethodProxy
-     */    
-    public Object intercept(Object obj, java.lang.reflect.Method method, Object[] args,
-                               MethodProxy proxy) throws Throwable;
+import java.lang.reflect.*;
+import java.util.*;
+import junit.framework.*;
+import net.sf.cglib.util.*;
 
+public class TestLazyLoader extends CodeGenTestCase {
+    public void testLazyLoader() {
+        LazyLoader loader = new LazyLoader() {
+                public Object loadObject() {
+                    System.err.println("loading object");
+                    return "foo";
+                }
+            };
+        CallbackFilter filter = new CallbackFilter() {
+                public int accept(Member member) {
+                    return Callbacks.LAZY_LOAD;
+                }
+            };
+        Callbacks callbacks = new Callbacks();
+        callbacks.set(Callbacks.LAZY_LOAD, loader);
+
+        Object obj = Enhancer.enhance(Object.class, null, callbacks, null, null, filter);
+        assertTrue("foo".equals(obj.toString()));
+    }
+
+    public TestLazyLoader(String testName) {
+        super(testName);
+    }
+    
+    public static void main(String[] args) {
+        junit.textui.TestRunner.run(suite());
+    }
+    
+    public static Test suite() {
+        return new TestSuite(TestLazyLoader.class);
+    }
 }
