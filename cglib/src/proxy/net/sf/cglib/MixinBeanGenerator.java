@@ -53,47 +53,19 @@
  */
 package net.sf.cglib;
 
-import net.sf.cglib.beans.*;
-import net.sf.cglib.algorithm.*;
-import junit.framework.*;
+import java.lang.reflect.Method;
+import net.sf.cglib.util.ReflectUtils;
 
 /**
- *@author     Gerhard Froehlich <a href="mailto:g-froehlich@gmx.de">
- *      g-froehlich@gmx.de</a>
- *@version    $Id: TestAll.java,v 1.28 2003-09-09 20:59:59 herbyderby Exp $
+ * @author Chris Nokleberg
+ * @version $Id: MixinBeanGenerator.java,v 1.1 2003-09-09 20:59:59 herbyderby Exp $
  */
-public class TestAll extends TestCase {
-    public TestAll(String testName) {
-        super(testName);
+class MixinBeanGenerator extends MixinGenerator {
+    public MixinBeanGenerator(Class[] classes) {
+        super(classes, null);
     }
 
-    public static Test suite() {
-       
-        // System.setSecurityManager( new java.rmi.RMISecurityManager());
-        
-        System.getProperties().list(System.out);
-        TestSuite suite = new TestSuite();
-        suite.addTest(TestEnhancer.suite());
-        suite.addTest(TestBulkBean.suite());
-        suite.addTest(TestMixin.suite());
-        suite.addTest(TestKeyFactory.suite());
-        suite.addTest(TestProxy.suite());
-        suite.addTest(TestMethodProxy.suite());
-        suite.addTest(TestParallelSorter.suite());
-        suite.addTest(TestSwitch.suite());
-        suite.addTest(TestStringSwitch.suite());
-        suite.addTest(TestBeanMap.suite());
-        suite.addTest(TestDispatcher.suite());
-        suite.addTest(TestLazyLoader.suite());
-        suite.addTest(TestNoOp.suite());
-        suite.addTest(TestMemberSwitch.suite());
-        suite.addTest(TestFastClass.suite());
-        return suite;
-    }
-
-    public static void main(String args[]) {
-        String[] testCaseName = {TestAll.class.getName()};
-        junit.textui.TestRunner.main(testCaseName);
+    protected Method[] getMethods(Class type) {
+        return ReflectUtils.getPropertyMethods(ReflectUtils.getBeanProperties(type), true, true);
     }
 }
-

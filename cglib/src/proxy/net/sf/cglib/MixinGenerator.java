@@ -55,13 +55,12 @@ package net.sf.cglib;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.beans.*;
 import java.util.*;
 import net.sf.cglib.util.*;
 
 /**
  * @author Chris Nokleberg
- * @version $Id: MixinGenerator.java,v 1.1 2003-09-09 19:49:03 herbyderby Exp $
+ * @version $Id: MixinGenerator.java,v 1.2 2003-09-09 20:59:59 herbyderby Exp $
  */
 class MixinGenerator extends CodeGenerator {
     private static final String FIELD_NAME = "CGLIB$DELEGATES";
@@ -76,7 +75,9 @@ class MixinGenerator extends CodeGenerator {
         setSuperclass(Mixin.class);
         this.classes = classes;
         this.route = route;
-        addInterfaces(classes);
+        if (classes[0].isInterface()) {
+            addInterfaces(classes);
+        }
     }
 
     protected void generate() throws NoSuchMethodException {
@@ -86,13 +87,17 @@ class MixinGenerator extends CodeGenerator {
 
         Set unique = new HashSet();
         for (int i = 0; i < classes.length; i++) {
-            Method[] methods = classes[i].getMethods();
+            Method[] methods = getMethods(classes[i]);
             for (int j = 0; j < methods.length; j++) {
                 if (unique.add(MethodWrapper.create(methods[j]))) {
                     generateProxy(methods[j], (route != null) ? route[i] : i);
                 }
             }
         }
+    }
+
+    protected Method[] getMethods(Class type) {
+        return type.getMethods();
     }
 
     private void generateConstructor() {
