@@ -18,15 +18,12 @@
 
     <property name="build.home" value="build/proxy"/>
     <property name="build.transform" value="build/transform"/>
-    <property name="samples.build.home" value="build/samples"/>
-
 
     <property name="test.build.home" value="build/test"/>
 
     <property name="dist.home" value="dist"/>
-    <property name="source.home" value="src/proxy"/>
-    <property name="samples.source.home" value="src/proxy/samples"/>
-    <property name="source.test" value="src/test"/>
+    <property name="source.home" value="src/main/java"/>
+    <property name="source.test" value="src/test/java"/>
     <property name="source.asm" value="../asm-src"/>    
 
     <property name="compile.target" value="1.2"/>
@@ -63,7 +60,6 @@
   <target depends="init" description="Prepare build directory" name="prepare">
     <mkdir dir="${build.home}"/>
     <mkdir dir="${build.home}/classes"/>
-    <mkdir dir="${samples.build.home}/classes"/>
     <mkdir dir="${build.home}/conf"/>
     <mkdir dir="${test.build.home}/classes"/>
    
@@ -121,7 +117,6 @@
 
     <jar basedir="${build.home}/classes" jarfile="${dist.home}/${component.name}-${component.version}.jar" >
       <include name="**/*"/>
-      <exclude name="samples/**" />
     </jar> 
 
     <taskdef name="jarjar" classname="com.tonicsystems.jarjar.JarJarTask" classpathref="compile.classpath"/>
@@ -130,7 +125,6 @@
       <zipfileset src="lib/asm-3.3.1.jar" excludes="META-INF"/>
       <rule pattern="org.objectweb.asm.**" result="net.sf.cglib.asm.@1"/>
       <include name="**/*"/>
-      <exclude name="samples/**"/>
     </jarjar> 
   </target>
 
@@ -158,60 +152,7 @@
 
   <target depends="clean,jar,srcjar" description="Create binary, docs and source distributions" name="dist"/>
  
-   <target depends="compile" name="compile-samples">
-     <javac debug="${compile.debug}" 
-            deprecation="${compile.deprecation}" 
-            destdir="${samples.build.home}/classes" 
-            optimize="${compile.optimize}" 
-            srcdir="${samples.source.home}">
-       <classpath refid="compile.classpath"/>
-       <compilerarg compiler="jikes" value="-nowarn"/>
-     </javac>
-   </target>  
-
-
-   <target depends="compile-samples" 
-          description="runs samples" 
-          name="samples-beans">
-    <java classname="Beans" 
-          failonerror="${test.failonerror}"
-          fork="yes" 
-          >
-
-        <classpath>
-          <pathelement path="${samples.build.home}/classes"/>
-          <pathelement path="${build.home}/classes"/>
-          <fileset dir="./lib">
-		<include name="*.*"/>
-          </fileset>
-        </classpath>
-    </java>
-  </target>
-
-
-
-   <target depends="compile-samples" 
-          description="runs samples" 
-          name="samples-trace">
-    <java classname="Trace" 
-          failonerror="${test.failonerror}"
-          fork="yes" 
-          >
-
-        <classpath>
-          <pathelement path="${samples.build.home}/classes"/>
-          <pathelement path="${build.home}/classes"/>
-          <fileset dir="./lib">
-		<include name="*.*"/>
-          </fileset>
-        </classpath>
-    </java>
-  </target>
-
-
-
-
-  <target depends="compile,compile-samples"
+  <target depends="compile"
     name="build-test">
     <javac debug="${compile.debug}" 
            deprecation="${compile.deprecation}" 
@@ -223,7 +164,6 @@
    <classpath refid="compile.classpath"/>
    <classpath>
    <pathelement path="${build.home}/classes"/>
-   <pathelement path="${samples.build.home}/classes" />
    </classpath> 
    <compilerarg compiler="jikes" value="-nowarn"/>
  
@@ -256,7 +196,6 @@
           <pathelement path="${classpath}"/>
           <pathelement path="${java.class.path}"/>
           <pathelement path="${source.test}"/>
-          <pathelement path="${samples.build.home}/classes" />      
           <fileset dir="./lib">
 		<include name="*.jar"/>
           </fileset>
