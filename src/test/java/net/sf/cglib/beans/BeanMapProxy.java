@@ -28,7 +28,7 @@ public class BeanMapProxy implements InvocationHandler {
     private Map map;
 
     public static Object newInstance(Map map, Class[] interfaces) {
-        return Proxy.newProxyInstance(map.getClass().getClassLoader(),
+        return Proxy.newProxyInstance(Thread.currentThread().getContextClassLoader(),
                                       interfaces,
                                       new BeanMapProxy(map));
     }
