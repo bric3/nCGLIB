@@ -9,6 +9,94 @@
 	<version>2.3-SNAPSHOT</version>
 	<name>CGLIB</name>
 
+	<organization>
+		<name>cglib</name> 
+		<url>http://github.com/bryc3/nCGLIB/</url> 
+	</organization>
+
+	<issueManagement>
+		<system>github</system>
+		<url>http://github.com/bryc3/nCGLIB/issues</url>
+	</issueManagement>
+
+	<scm>
+		<connection>scm:git:git://github.com/bryc3/nCGLIB.git</connection>
+		<developerConnection>scm:git:ssh://git@github.com:bryc3/nCGLIB.git</developerConnection>
+	</scm>
+
+	<developers>
+
+		<developer>
+			<name>Brice Dutheil</name>
+			<id>bryc3</id>
+			<organization></organization>
+			<roles>
+				<role>Developer</role>
+			</roles>
+		</developer>
+
+		<developer>
+			<name>Arnaud Bailly</name>
+			<id>abailly</id>
+			<email>arnaud.oqube@gmail.com</email>
+			<organization></organization>
+			<roles>
+				<role>Developer</role>
+			</roles>
+		</developer>
+
+		<developer>
+			<name>Juozas Baliuka</name>
+			<id>baliuka</id>
+			<email>cglib-devel@lists.sourceforge.net</email>
+			<organization></organization>
+			<roles>
+				<role>Administrator</role>
+				<role>Release Manager</role>
+				<role>Developer</role>
+			</roles>
+		</developer>
+
+		<developer>
+			<name>Chris Nokleberg</name>
+			<id>herbyderby</id>
+			<email>cglib-devel@lists.sourceforge.net</email>
+			<organization></organization>
+			<roles>
+				<role>Administrator</role>
+				<role>Release Manager</role>
+				<role>Developer</role>
+			</roles>
+		</developer>
+
+		<developer>
+			<name>Matas Ramoska</name>
+			<id>mr226maf</id>
+			<email>cglib-devel@lists.sourceforge.net</email>
+			<organization></organization>
+			<roles>
+				<role>Administrator</role>
+				<role>Release Manager</role>
+				<role>Developer</role>
+			</roles>
+		</developer>
+
+
+		<developer>
+			<name>Wes Biggs</name>
+			<id>wbiggs</id>
+			<email>cglib-devel@lists.sourceforge.net</email>
+			<organization></organization>
+			<roles>
+				<role>Administrator</role>
+				<role>Release Manager</role>
+				<role>Developer</role>
+			</roles>
+		</developer>
+
+	</developers>
+
+
 	<dependencies>
 		<dependency>
 			<groupId>asm</groupId>
