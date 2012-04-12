@@ -8,4 +8,6 @@ public interface ClassFXBuilder<T> {
     ClassFXBuilder<T> withInterfaces(Class<?>... interfaces);
 
     ClassFXBuilder<T> withClassLoader(ClassLoaderProvider classLoaderProvider);
+
+    T newInstance();
 }

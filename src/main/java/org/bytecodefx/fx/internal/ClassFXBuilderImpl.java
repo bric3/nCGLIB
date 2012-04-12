@@ -25,4 +25,8 @@ public class ClassFXBuilderImpl<T> implements ClassFXBuilder<T> {
     public ClassFXBuilder<T> withClassLoader(ClassLoaderProvider classLoaderProvider) {
         return this;
     }
+
+    public T newInstance() {
+        return null;
+    }
 }
